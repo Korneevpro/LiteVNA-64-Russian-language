@@ -54,6 +54,11 @@ python patcher/patch_litevna_ru.py "LiteVNA64 v1.4.08.bin"
 
 Подробная инструкция: [docs/ПРОШИВКА.md](docs/ПРОШИВКА.md).
 
+Для Windows отдельно описана установка драйвера **AT32 Bootloader DFU**: [drivers/README.md](drivers/README.md).
+
+Для записи используется браузерный **WebUSB DFU Flasher** DiSlord:
+https://dislord.github.io/WebUSB-DFU-Flasher/webusb_dfu.html
+
 ## Важное предупреждение
 
 Прошивка микроконтроллера всегда связана с риском. Перед экспериментами рекомендуется считать полный дамп внутренней Flash и сохранить оригинальный BIN. Для AT32 Bootloader DFU не изменяйте Option Bytes без необходимости.
