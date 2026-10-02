@@ -1,0 +1,17 @@
+# Бинарные образы прошивок
+*.bin
+*.dfu
+
+# Резервные дампы
+*.dump
+*.bak
+
+# Python
+__pycache__/
+*.pyc
+
+# ОС/редакторы
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
