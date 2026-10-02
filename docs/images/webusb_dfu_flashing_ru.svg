@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="980" viewBox="0 0 1500 980">
+  <style>
+    .title{font:700 30px Arial,sans-serif;fill:#1d1d1f}
+    .ui{font:18px Consolas,monospace;fill:#e9eef5}
+    .green{fill:#49d45d}
+    .blue{fill:#37a8ff}
+    .small{font:15px Consolas,monospace;fill:#d8e4f0}
+    .box{fill:#fff;stroke:#c9cdd2;stroke-width:2}
+    .bt{font:700 23px Arial,sans-serif;fill:#202124}
+    .body{font:19px Arial,sans-serif;fill:#333}
+    .num{fill:#dc5634;stroke:#fff;stroke-width:2}
+    .ntext{font:700 20px Arial,sans-serif;fill:#fff;text-anchor:middle;dominant-baseline:middle}
+    .arrow{stroke:#c2472b;stroke-width:3;fill:none;marker-end:url(#ah)}
+    .warn{fill:#fff4dc;stroke:#de9a29;stroke-width:2}
+    .warntext{font:18px Arial,sans-serif;fill:#69430b}
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L9,3 L0,6 Z" fill="#c2472b"/></marker>
+  </defs>
+
+  <text x="680" y="42" class="title">Прошивка LiteVNA64 через WebUSB DFU Flasher</text>
+
+  <!-- Условная копия интерфейса -->
+  <rect x="30" y="65" width="610" height="835" rx="8" fill="#0a0b10" stroke="#343843" stroke-width="3"/>
+  <text x="230" y="100" style="font:700 27px Arial,sans-serif;fill:#6597ff">WebUSB DFU Flasher</text>
+  <rect x="50" y="120" width="570" height="35" rx="5" fill="#248fe0"/>
+  <text x="275" y="145" style="font:700 19px Arial,sans-serif;fill:white">Disconnect</text>
+
+  <text x="55" y="183" class="small green">Manufacturer: Artery Technology</text>
+  <text x="55" y="205" class="small green">Device: AT32 Bootloader DFU</text>
+  <text x="55" y="227" class="small green">VID:PID: 0x2E3C:0xDF11</text>
+  <text x="55" y="249" class="small green">DFU Interface: 0</text>
+  <text x="55" y="271" class="small green">Internal Flash: 0x08000000..0x080FFFFF</text>
+  <text x="55" y="293" class="small green">Option Byte: 0x1FFFF800..</text>
+
+  <rect x="50" y="330" width="570" height="38" rx="5" fill="#248fe0"/>
+  <text x="190" y="355" style="font:700 18px Arial,sans-serif;fill:white">LiteVNA64_v1.4.08_RU_R3DQB.bin</text>
+
+  <text x="50" y="410" class="ui">Flash start address:</text>
+  <rect x="245" y="382" width="190" height="38" rx="6" fill="#17191f" stroke="#29a34a" stroke-width="2"/>
+  <text x="263" y="408" class="ui">0x08004000</text>
+
+  <rect x="52" y="441" width="18" height="18" fill="#2a9df4"/><text x="82" y="457" class="ui">Erase before flashing</text>
+  <rect x="52" y="477" width="18" height="18" fill="#2a9df4"/><text x="82" y="493" class="ui">Verify after flashing</text>
+
+  <rect x="50" y="520" width="185" height="48" rx="6" fill="#16a52e"/><text x="112" y="551" style="font:700 21px Arial,sans-serif;fill:white">Flash</text>
+  <rect x="245" y="520" width="185" height="48" rx="6" fill="#ff8a18"/><text x="280" y="551" style="font:700 19px Arial,sans-serif;fill:white">Verify Only</text>
+  <rect x="440" y="520" width="180" height="48" rx="6" fill="#333742"/><text x="482" y="551" style="font:700 19px Arial,sans-serif;fill:white">Read from</text>
+
+  <rect x="50" y="590" width="570" height="270" rx="5" fill="#090a0e" stroke="#454955"/>
+  <text x="65" y="625" class="small green">Connected: AT32 Bootloader DFU (Artery Technology)</text>
+  <text x="65" y="650" class="small green">Device ready</text>
+  <text x="65" y="675" class="small green">Binary file loaded</text>
+  <text x="65" y="700" class="small green">... Flash / Verify log ...</text>
+
+  <!-- номера -->
+  <circle cx="338" cy="138" r="18" class="num"/><text x="338" y="138" class="ntext">1</text>
+  <circle cx="338" cy="349" r="18" class="num"/><text x="338" y="349" class="ntext">2</text>
+  <circle cx="445" cy="400" r="18" class="num"/><text x="445" y="400" class="ntext">3</text>
+  <circle cx="42" cy="450" r="18" class="num"/><text x="42" y="450" class="ntext">4</text>
+  <circle cx="42" cy="486" r="18" class="num"/><text x="42" y="486" class="ntext">5</text>
+  <circle cx="140" cy="544" r="18" class="num"/><text x="140" y="544" class="ntext">6</text>
+  <circle cx="338" cy="700" r="18" class="num"/><text x="338" y="700" class="ntext">7</text>
+
+  <!-- пояснения -->
+  <g transform="translate(680,75)">
+    <rect width="790" height="105" rx="10" class="box"/><text x="18" y="34" class="bt">1. Подключение DFU</text><text x="18" y="65" class="body">Должно определиться устройство AT32 Bootloader DFU.</text><text x="18" y="91" class="body">Для протестированного LiteVNA64: VID:PID = 2E3C:DF11.</text>
+  </g>
+  <g transform="translate(680,195)">
+    <rect width="790" height="105" rx="10" class="box"/><text x="18" y="34" class="bt">2. Файл прошивки</text><text x="18" y="66" class="body">Выберите подготовленный BIN русской версии LiteVNA64 v1.4.08.</text>
+  </g>
+  <g transform="translate(680,315)">
+    <rect width="790" height="105" rx="10" class="box"/><text x="18" y="34" class="bt">3. Адрес записи</text><text x="18" y="66" class="body">Обязательно: 0x08004000. Не используйте 0x08000000 для BIN приложения.</text>
+  </g>
+  <g transform="translate(680,435)">
+    <rect width="790" height="90" rx="10" class="box"/><text x="18" y="34" class="bt">4. Стереть перед записью</text><text x="18" y="65" class="body">Erase before flashing — включено.</text>
+  </g>
+  <g transform="translate(680,540)">
+    <rect width="790" height="90" rx="10" class="box"/><text x="18" y="34" class="bt">5. Проверить после записи</text><text x="18" y="65" class="body">Verify after flashing — включено.</text>
+  </g>
+  <g transform="translate(680,645)">
+    <rect width="790" height="90" rx="10" class="box"/><text x="18" y="34" class="bt">6. Запись</text><text x="18" y="65" class="body">Нажмите Flash и не отключайте USB до окончания Verify.</text>
+  </g>
+  <g transform="translate(680,750)">
+    <rect width="790" height="105" rx="10" class="box"/><text x="18" y="34" class="bt">7. Журнал</text><text x="18" y="65" class="body">После записи ошибок и mismatches быть не должно.</text><text x="18" y="91" class="body">Verify Only до прошивки может показать различия — это нормально.</text>
+  </g>
+
+  <path d="M356 138 L670 120" class="arrow"/>
+  <path d="M356 349 L670 245" class="arrow"/>
+  <path d="M463 400 L670 365" class="arrow"/>
+  <path d="M60 450 L670 480" class="arrow"/>
+  <path d="M60 486 L670 585" class="arrow"/>
+  <path d="M158 544 L670 690" class="arrow"/>
+  <path d="M356 700 L670 800" class="arrow"/>
+
+  <rect x="680" y="885" width="790" height="65" rx="10" class="warn"/>
+  <text x="700" y="912" class="warntext">Важно: не изменяйте Option Byte.</text>
+  <text x="700" y="936" class="warntext">Перед прошивкой желательно сохранить полный дамп Internal Flash.</text>
+</svg>
