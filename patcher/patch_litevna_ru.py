@@ -12,14 +12,27 @@ from __future__ import annotations
 import argparse
 import base64
 import hashlib
+import struct
 from pathlib import Path
 import sys
 
 BASE_SHA256 = "22f91d4769b81b058343ad94055cbd94a2cffbc7e0378619a94d6abfc515d501"
-OUTPUT_SHA256 = "368f443dc288b7be337d638db00b2858bd0f1530154de81449391ed3b7fb1bc7"
+LEGACY_OUTPUT_SHA256 = "368f443dc288b7be337d638db00b2858bd0f1530154de81449391ed3b7fb1bc7"
+OUTPUT_SHA256 = "67fa2538b87730aa74aef6517d99aca834eee58ea4e4d26d01952f74c88f7516"
 BASE_SIZE = 88128
-OUTPUT_SIZE = 92853
+LEGACY_OUTPUT_SIZE = 92853
+OUTPUT_SIZE = 94506
 DEFAULT_OUTPUT = "LiteVNA64_v1.4.08_RU_R3DQB.bin"
+
+FLASH_BASE = 0x08004000
+FONT_PTR_SITES = (0x009F8, 0x0A5FC, 0x0A6F8)
+ORIG_FONT_BASE = 0x1126C
+RU_FONT_BASE = 0x157C7
+FONT_FIRST_CHAR = 0x0B
+RU_FONT_FIRST_VALID_CHAR = 0x16
+FONT_LAST_CHAR = 0xA0
+FONT_GLYPH_SIZE = 11
+OLD_RU_FONT_ADDR = FLASH_BASE + RU_FONT_BASE
 
 # C = скопировать диапазон из исходной прошивки: ('C', offset, length)
 # D = добавить новые данные, закодированные Base64: ('D', '...')
@@ -158,6 +171,68 @@ def sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+
+def repair_font_table(source: bytes, localized: bytes) -> bytes:
+    """Собирает полную таблицу 7x11 и перенаправляет на неё рендерер.
+
+    В первой версии локализации перенесённая таблица начиналась фактически
+    с символа 0x16, тогда как LiteVNA64 v1.4.08 индексирует её с 0x0B.
+    Поэтому служебные глифы 0x0B..0x15, включая символ сопротивления Ω
+    (0x0C), читались из посторонних данных.
+
+    Исправление не перезаписывает существующие данные локализации:
+    новая полная таблица добавляется в конец образа, после чего меняются
+    только три проверенных указателя на таблицу шрифта.
+    """
+    if len(localized) != LEGACY_OUTPUT_SIZE:
+        raise RuntimeError(
+            f"Неверный промежуточный размер: {len(localized)} вместо {LEGACY_OUTPUT_SIZE} байт."
+        )
+
+    for site in FONT_PTR_SITES:
+        current = struct.unpack_from("<I", localized, site)[0]
+        if current != OLD_RU_FONT_ADDR:
+            raise RuntimeError(
+                f"Неожиданный указатель шрифта по смещению 0x{site:X}: 0x{current:08X}."
+            )
+
+    prefix_size = (RU_FONT_FIRST_VALID_CHAR - FONT_FIRST_CHAR) * FONT_GLYPH_SIZE
+    font_size = (FONT_LAST_CHAR - FONT_FIRST_CHAR + 1) * FONT_GLYPH_SIZE
+    suffix_size = font_size - prefix_size
+
+    prefix = source[ORIG_FONT_BASE:ORIG_FONT_BASE + prefix_size]
+    suffix_off = RU_FONT_BASE + prefix_size
+    suffix = localized[suffix_off:suffix_off + suffix_size]
+
+    if len(prefix) != prefix_size or len(suffix) != suffix_size:
+        raise RuntimeError("Не удалось собрать полную таблицу шрифта.")
+
+    full_font = prefix + suffix
+
+    # Ω — код 0x0C. Сверяем его с исходной штатной таблицей.
+    ohm_index = 0x0C - FONT_FIRST_CHAR
+    glyph_start = ohm_index * FONT_GLYPH_SIZE
+    glyph_end = glyph_start + FONT_GLYPH_SIZE
+    source_ohm = source[
+        ORIG_FONT_BASE + glyph_start:
+        ORIG_FONT_BASE + glyph_end
+    ]
+    if full_font[glyph_start:glyph_end] != source_ohm:
+        raise RuntimeError("Контроль глифа Ω не пройден.")
+
+    out = bytearray(localized)
+    while len(out) % 4:
+        out.append(0)
+
+    new_font_off = len(out)
+    out.extend(full_font)
+    new_font_addr = FLASH_BASE + new_font_off
+
+    for site in FONT_PTR_SITES:
+        struct.pack_into("<I", out, site, new_font_addr)
+
+    return bytes(out)
+
 def apply_patch(source: bytes) -> bytes:
     if len(source) != BASE_SIZE:
         raise ValueError(f"Неверный размер исходной прошивки: {len(source)} байт; ожидается {BASE_SIZE}.")
@@ -180,7 +255,21 @@ def apply_patch(source: bytes) -> bytes:
         else:
             raise RuntimeError(f"Неизвестная операция патча: {op[0]}")
 
-    result = bytes(out)
+    legacy = bytes(out)
+    if len(legacy) != LEGACY_OUTPUT_SIZE:
+        raise RuntimeError(
+            f"Ошибка промежуточной сборки: размер {len(legacy)} вместо {LEGACY_OUTPUT_SIZE} байт."
+        )
+    legacy_sha = sha256(legacy)
+    if legacy_sha != LEGACY_OUTPUT_SHA256:
+        raise RuntimeError(
+            "Контрольная сумма промежуточной локализации не совпала.\n"
+            f"Ожидается: {LEGACY_OUTPUT_SHA256}\n"
+            f"Получено:  {legacy_sha}"
+        )
+
+    result = repair_font_table(source, legacy)
+
     if len(result) != OUTPUT_SIZE:
         raise RuntimeError(f"Ошибка сборки: размер {len(result)} вместо {OUTPUT_SIZE} байт.")
     actual_out = sha256(result)
